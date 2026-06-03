@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>携程合同计算器 | 定制师专用</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232577E3' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9'/%3E%3Cpath d='M10.3 21a1.94 1.94 0 0 0 3.4 0'/%3E%3C/svg%3E">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --ctrip-blue: #2577E3;
+      --ctrip-dark: #1a5bb5;
+      --ctrip-light: #eef4ff;
+      --ctrip-orange: #FF6600;
+      --success: #00b578;
+      --danger: #ff4d4f;
+      --warning: #faad14;
+      --text-primary: #1a1a1a;
+      --text-secondary: #666;
+      --text-tertiary: #999;
+      --border: #e8e8e8;
+      --bg-page: #f5f7fa;
+      --bg-card: #fff;
+      --shadow: 0 2px 8px rgba(0,0,0,0.08);
+      --shadow-hover: 0 4px 16px rgba(37,119,227,0.15);
+      --radius: 8px;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+      background: var(--bg-page);
+      color: var(--text-primary);
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+    
+    /* Header */
+    .header {
+      background: var(--ctrip-blue);
+      color: white;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header-logo {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .header-logo svg {
+      width: 28px;
+      height: 28px;
+      fill: white;
+    }
+    .header-subtitle {
+      font-size: 13px;
+      opacity: 0.9;
+      font-weight: 400;
+      margin-left: 8px;
+      padding-left: 12px;
+      border-left: 1px solid rgba(255,255,255,0.3);
+    }
+    
+    /* Main Layout */
+    /* Main Layout - 3 columns */
+    .main-layout {
+      display: grid;
+      grid-template-columns: 260px 1fr 280px;
+      gap: 0;
+      min-height: calc(100vh - 56px);
+    }
+    
+    /* Left Panel */
+    .left-panel {
+      background: var(--bg-card);
+      border-right: 1px solid var(--border);
+      padding: 16px;
+      overflow-y: auto;
+      max-height: calc(100vh - 56px);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    
+    /* Center Panel */
+    .center-panel {
+      background: var(--bg-page);
+      padding: 16px 20px;
+      overflow-y: auto;
+      max-height: calc(100vh - 56px);
+      display: block;
+    }
+    
+    /* Right Panel */
+    .right-panel {
+      background: var(--bg-card);
+      border-left: 1px solid var(--border);
+      padding: 16px;
+      overflow-y: auto;
+      max-height: calc(100vh - 56px);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .right-panel .detail-drawer {
+      flex: 1;
+      min-height: 200px;
+    }
+    
+    .panel-section {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+    }
+    .panel-section-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .panel-section-title .icon {
+      width: 18px;
+      height: 18px;
+      color: var(--ctrip-blue);
+    }
+    
+    /* Paste Area */
+    .paste-box {
+      position: relative;
+    }
+    .paste-box textarea {
+      width: 100%;
+      height: 140px;
+      border: 2px dashed #d0d5e3;
+      border-radius: var(--radius);
+      padding: 12px;
+      font-size: 12px;
+      resize: none;
+      transition: all 0.2s;
+      background: #fafbfc;
+      line-height: 1.6;
+    }
+    .paste-box textarea:focus {
+      outline: none;
+      border-color: var(--ctrip-blue);
+      background: white;
+      box-shadow: 0 0 0 3px rgba(37,119,227,0.1);
+    }
+    .paste-box textarea::placeholder {
+      color: #b0b8c8;
+    }
+    
+    /* Buttons */
+    .btn-group {
+      display: flex;
+      gap: 8px;
+    }
+    .btn {
+      padding: 10px 16px;
+      border-radius: var(--radius);
+      border: none;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .btn-primary {
+      background: var(--ctrip-blue);
+      color: white;
+      justify-content: center;
+    }
+    .btn-primary:hover {
+      background: var(--ctrip-dark);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-hover);
+    }
+    .btn-secondary {
+      background: #f0f2f5;
+      color: var(--text-secondary);
+    }
+    .btn-secondary:hover {
+      background: #e4e6eb;
+    }
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+    
+    /* Stats */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .stat-card {
+      background: var(--ctrip-light);
+      border-radius: var(--radius);
+      padding: 12px;
+      text-align: center;
+      border: 1px solid #dbeafe;
+    }
+    .stat-card .stat-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--ctrip-blue);
+      font-family: 'SF Mono', monospace;
+    }
+    .stat-card .stat-label {
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+    
+    /* Right Panel */
+    .right-panel {
+      padding: 16px 20px;
+      overflow-y: auto;
+      max-height: calc(100vh - 56px);
+      display: block;
+    }
+    
+    /* Table */
+    .table-card {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      width: 100%;
+    }
+    .table-card-header {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .table-card-header h3 {
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .table-card-header h3 .icon {
+      color: var(--ctrip-blue);
+      width: 18px;
+      height: 18px;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    th {
+      background: #fafbfc;
+      color: var(--text-secondary);
+      font-weight: 600;
+      text-align: left;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+      font-size: 13px;
+    }
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid #f5f5f5;
+      vertical-align: middle;
+    }
+    tr:hover td {
+      background: #fafbfc;
+    }
+    tr:last-child td {
+      border-bottom: none;
+    }
+    
+    .type-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 3px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .type-hotel { background: #f0e6ff; color: #7c3aed; }
+    .type-ticket { background: #e6f7ef; color: #059669; }
+    .type-dijie { background: #ffe6e6; color: #dc2626; }
+    .type-service { background: #fff0e6; color: #ea580c; }
+    .type-insurance { background: #f0f0f0; color: #6b7280; }
+    .type-flight { background: #e6efff; color: #2563eb; }
+    .type-train { background: #e6f9ff; color: #0891b2; }
+    
+    .name-cell {
+      font-size: 14px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .name-cell:hover {
+      white-space: normal;
+      overflow: visible;
+    }
+    .date-tag {
+      font-size: 10px;
+      color: var(--text-tertiary);
+      background: #f0f2f5;
+      padding: 1px 4px;
+      border-radius: 3px;
+      margin-right: 4px;
+    }
+    
+    .price-cell {
+      font-family: 'SF Mono', monospace;
+      font-weight: 500;
+      color: var(--text-primary);
+      white-space: nowrap;
+      font-size: 14px;
+    }
+    .price-system {
+      color: var(--text-secondary);
+    }
+    
+    input[type="number"] {
+      width: 80px;
+      padding: 7px 10px;
+      border: 1px solid #d0d5e3;
+      border-radius: 4px;
+      font-size: 14px;
+      text-align: right;
+      font-family: 'SF Mono', monospace;
+    }
+    input[type="number"]:focus {
+      outline: none;
+      border-color: var(--ctrip-blue);
+      box-shadow: 0 0 0 2px rgba(37,119,227,0.1);
+    }
+    input[type="number"].has-value {
+      border-color: var(--success);
+      background: #f0fdf4;
+    }
+    
+    .qty-input {
+      width: 55px !important;
+    }
+    .qty-detail {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      margin-top: 2px;
+    }
+    
+    .choice-tag {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .choice-system { background: #e6efff; color: #1e40af; }
+    .choice-zicai { background: #dcfce7; color: #166534; }
+    .choice-must { background: #ffe6e6; color: #991b1b; }
+    
+/* Tax rate display */
+    .tax-rate {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      line-height: 1.6;
+      white-space: nowrap;
+    }
+    .tax-rate .agent { color: #2563eb; }
+    .tax-rate .retail { color: #dc2626; }
+    
+    .source-select {
+      width: 60px;
+      padding: 4px 6px;
+      border: 1px solid #d0d5e3;
+      border-radius: 4px;
+      font-size: 12px;
+      background: white;
+      cursor: pointer;
+    }
+
+    /* Result Bar - Larger, at top */
+    .result-bar {
+      background: white;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--ctrip-blue);
+      padding: 16px 20px;
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 0;
+      font-size: 15px;
+      width: 100%;
+    }
+    .result-bar.show { display: flex; }
+    .result-bar-left { display: flex; flex-direction: column; gap: 10px; }
+    .result-bar-item { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+    .result-bar-item .label { color: var(--text-secondary); font-size: 14px; }
+    .result-bar-item .value { font-family: 'SF Mono', monospace; font-weight: 700; font-size: 24px; }
+    .result-bar-item .value.positive { color: var(--success); }
+    .result-bar-item .value.negative { color: var(--danger); }
+    .result-bar-diff { font-size: 14px; color: var(--text-secondary); text-align: center; padding-top: 8px; border-top: 1px dashed var(--border); }
+    .result-bar-diff strong { color: var(--success); font-size: 16px; }
+    .result-bar-badge {
+      padding: 6px 14px; border-radius: 14px; font-size: 13px; font-weight: 700;
+      background: var(--success); color: white; text-align: center;
+    }
+    .result-bar-right { display: flex; justify-content: center; }
+
+    /* Detail Drawer - Inline in right panel */
+    .detail-drawer {
+      display: none;
+      background: white;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      flex: 1;
+      min-height: 0;
+      flex-direction: column;
+    }
+    .detail-drawer.show { display: flex; }
+    .detail-drawer-header {
+      padding: 10px 14px; background: #fafbfc; border-bottom: 1px solid var(--border);
+      font-size: 13px; font-weight: 600; display: flex; justify-content: space-between; align-items: center;
+    }
+    .detail-drawer-body { padding: 12px; overflow-y: auto; font-size: 12px; }
+    .detail-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #f5f5f5; }
+    .detail-row:last-child { border-bottom: none; }
+    .detail-row-total { margin-top: 8px; padding-top: 8px; border-top: 2px solid var(--border); font-weight: 600; }
+    
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-tertiary);
+    }
+    .empty-state svg {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+    .empty-state p {
+      font-size: 16px;
+    }
+    
+    /* Tips */
+    .tips-box {
+      background: var(--ctrip-light);
+      border-left: 3px solid var(--ctrip-blue);
+      padding: 10px 12px;
+      border-radius: 0 4px 4px 0;
+      font-size: 12px;
+      color: #1e40af;
+      line-height: 1.6;
+    }
+    .tips-box strong {
+      color: var(--ctrip-dark);
+    }
+    
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #d0d5e3;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #b0b8c8;
+    }
+    
+    /* Responsive */
+    @media (max-width: 900px) {
+      .main-layout {
+        grid-template-columns: 1fr;
+      }
+      .left-panel {
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        max-height: none;
+      }
+      .right-panel {
+        max-height: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-logo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>
+      <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
+    </svg>
+    携程
+  </div>
+  <div class="header-subtitle">合同计算器 · 定制师专用</div>
+</div>
+
+<!-- Main Layout -->
+<div class="main-layout">
+
+  <!-- Left Panel -->
+  <div class="left-panel">
+    
+    <!-- Paste Area -->
+    <div class="panel-section">
+      <div class="panel-section-title">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12h.01M15 12h.01M10 16c.5.3 1.2.5 2 .5s1.5-.2 2-.5M22 12c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2s10 4.477 10 10z"/></svg>
+        粘贴方案
+      </div>
+      <div class="paste-box">
+        <textarea id="pasteInput" placeholder="把携程方案的报价明细复制粘贴到这里...&#10;&#10;支持：机票、火车、酒店、门票、保险、出行工具、服务费"></textarea>
+      </div>
+    </div>
+    
+    <!-- Buttons -->
+    <div class="btn-group">
+      <button class="btn btn-primary" onclick="parseAndFill()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        解析方案
+      </button>
+      <button class="btn btn-secondary btn-sm" onclick="loadDemo()">示例</button>
+      <button class="btn btn-secondary btn-sm" onclick="clearAll()">清空</button>
+    </div>
+    
+    <!-- Tips -->
+    <div class="tips-box">
+      <strong>使用步骤：</strong>粘贴携程方案 → 点"解析" → 填自采单价 → 点"计算利润" → 看推荐结果
+    </div>
+    
+    <!-- Stats -->
+    <div class="panel-section" id="statsSection" style="display:none">
+      <div class="panel-section-title">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+        方案概览
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value" id="itemCount">0</div>
+          <div class="stat-label">资源项</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="systemTotal">¥0</div>
+          <div class="stat-label">系统总价</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="pendingZicai">0</div>
+          <div class="stat-label">待填单价</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="hotelNights">0</div>
+          <div class="stat-label">酒店间夜</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Calculate Button -->
+    <button class="btn btn-primary" onclick="calculate()" id="calcBtn" style="display:none">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+      计算利润
+    </button>
+    
+  </div>
+  
+  <!-- Center Panel -->
+  <div class="center-panel">
+    
+    <!-- Empty State -->
+    <div id="emptyState" class="empty-state">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12h.01M15 12h.01M10 16c.5.3 1.2.5 2 .5s1.5-.2 2-.5M22 12c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2s10 4.477 10 10z"/></svg>
+      <p>左侧粘贴携程方案文本，或点击"示例"加载测试数据</p>
+    </div>
+    
+    <!-- Table -->
+    <div class="table-card" id="tableCard" style="display:none">
+      <div class="table-card-header">
+        <h3>
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+          资源明细
+        </h3>
+        <span style="font-size:11px;color:#999">填自采单价，系统自动计算总价</span>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:55px">类型</th>
+            <th>名称</th>
+            <th style="width:85px">系统价</th>
+            <th style="width:60px">数量</th>
+            <th style="width:85px">自采单价</th>
+            <th style="width:85px">自采总价</th>
+            <th style="width:70px">来源</th>
+            <th style="width:70px">扣税</th>
+            <th style="width:55px">选择</th>
+          </tr>
+        </thead>
+        <tbody id="itemsBody"></tbody>
+      </table>
+    </div>
+    
+  </div>
+  
+  <!-- Right Panel -->
+  <div class="right-panel">
+    
+    <!-- Result Bar -->
+    <div class="result-bar" id="resultBar">
+      <div class="result-bar-left">
+        <span id="resultBadge" class="result-bar-badge">代理更优</span>
+        <div class="result-bar-item">
+          <span class="label">代理</span>
+          <span class="value positive" id="agentTotal">¥0</span>
+        </div>
+        <div class="result-bar-item">
+          <span class="label">零售</span>
+          <span class="value" id="retailTotal">¥0</span>
+        </div>
+        <span class="result-bar-diff" id="resultDiff"></span>
+      </div>
+      <div class="result-bar-right">
+        <button class="btn btn-secondary btn-sm" onclick="toggleDetail()">详细对比</button>
+      </div>
+    </div>
+    
+    <!-- Detail Drawer -->
+    <div class="detail-drawer" id="detailDrawer">
+      <div class="detail-drawer-header">
+        <span>逐项对比</span>
+        <button class="btn btn-secondary btn-sm" onclick="toggleDetail()">关闭</button>
+      </div>
+      <div class="detail-drawer-body" id="detailDrawerBody"></div>
+    </div>
+    
+  </div>
+</div>
+
+<script>
+// 扣税规则
+const TAX_RATES = {
+  retail: {
+    hotel: 0.14, ticket_normal: 0.07, ticket_emeishan: 0.035,
+    ticket_panda_dujiangyan_qingcheng: 0.02, train: 0.01, flight: 0.02,
+    dijie: 0.14, insurance: 0, service: 0.14, activity: 0.14
+  },
+  agent: {
+    hotel_system: 0, hotel_zicai: 0.16, ticket_system: 0,
+    ticket_normal_zicai: 0.09, ticket_emeishan_zicai: 0.055,
+    ticket_panda_dujiangyan_qingcheng_zicai: 0.04,
+    train_system: 0, train_zicai: 0.03, flight_system: 0, flight_zicai: 0.04,
+    dijie: 0.16, insurance: 0, service: 0.16, activity: 0.16
+  }
+};
+
+function getTaxRateText(item) {
+  let agentRate = '', retailRate = '';
+  if (item.category === 'dijie') { agentRate = '16%'; retailRate = '14%'; }
+  else if (item.category === 'insurance') { agentRate = '0%'; retailRate = '0%'; }
+  else if (item.category === 'flight') { agentRate = '4%'; retailRate = '2%'; }
+  else if (item.category === 'train') { agentRate = '3%'; retailRate = '1%'; }
+  else if (item.category === 'hotel') { agentRate = '16%'; retailRate = '14%'; }
+  else if (item.category === 'ticket') {
+    if (item.ticketType === 'ticket_emeishan') { agentRate = '5.5%'; retailRate = '3.5%'; }
+    else if (item.ticketType === 'ticket_panda_dujiangyan_qingcheng') { agentRate = '4%'; retailRate = '2%'; }
+    else { agentRate = '9%'; retailRate = '7%'; }
+  }
+  return `<span class="agent">代理${agentRate}</span><br><span class="retail">零售${retailRate}</span>`;
+}
+
+let items = [];
+
+function parseAndFill() {
+  const text = document.getElementById('pasteInput').value.trim();
+  if (!text) { alert('请先粘贴携程方案内容'); return; }
+  items = parseItinerary(text);
+  renderTable();
+  updateSummary();
+  document.getElementById('tableCard').style.display = 'block';
+  document.getElementById('emptyState').style.display = 'none';
+  document.getElementById('calcBtn').style.display = 'flex';
+  document.getElementById('statsSection').style.display = 'block';
+  document.getElementById('resultBar').classList.remove('show');
+  document.getElementById('detailDrawer').classList.remove('show');
+}
+
+function parseQuantity(secLines, totalIdx) {
+  let startIdx = Math.max(0, totalIdx - 20);
+  for (let j = totalIdx - 1; j >= 0; j--) {
+    if (secLines[j] === '总价') { startIdx = j + 1; break; }
+    if (/^\d{2}月\d{2}日/.test(secLines[j])) { startIdx = j; break; }
+  }
+  let qty = 0, rooms = 1, nights = 1;
+  for (let j = startIdx; j < totalIdx; j++) {
+    const line = secLines[j];
+    const hotelMatch = line.match(/x\s*(\d+)\s*间\s*x\s*(\d+)\s*晚/);
+    if (hotelMatch) {
+      rooms = parseInt(hotelMatch[1]);
+      nights = parseInt(hotelMatch[2]);
+      qty = rooms * nights;
+      break;
+    }
+    const match = line.match(/x\s*(\d+)\s*(份|人|张|个|台|次|套|组)/);
+    if (match) qty += parseInt(match[1]);
+  }
+  return { qty: qty > 0 ? qty : 1, rooms, nights };
+}
+
+function parseItinerary(text) {
+  const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+  const sectionHeaders = ['机票','火车','酒店','门票','保险','出行工具','服务费','活动','导游'];
+  function isSectionHeader(line) { return sectionHeaders.includes(line); }
+  function findRealSections(lines) {
+    const sections = [];
+    for (let i = 0; i < lines.length; i++) {
+      if (isSectionHeader(lines[i])) {
+        let hasContent = false;
+        for (let j = i+1; j < Math.min(lines.length, i+10); j++) {
+          if (lines[j].match(/¥\d+/) || lines[j] === '总价') { hasContent = true; break; }
+        }
+        if (hasContent) sections.push({ name: lines[i], start: i+1 });
+      }
+    }
+    for (let i = 0; i < sections.length; i++) {
+      if (i+1 < sections.length) sections[i].end = sections[i+1].start - 1;
+      else sections[i].end = lines.length;
+    }
+    return sections;
+  }
+  const sections = findRealSections(lines);
+  const allItems = [];
+  sections.forEach(section => {
+    const secLines = lines.slice(section.start, section.end);
+    for (let i = 0; i < secLines.length; i++) {
+      if (secLines[i] === '总价' && i+1 < secLines.length) {
+        const match = secLines[i+1].match(/¥(\d+(?:,\d+)*)/);
+        if (match) {
+          const price = parseInt(match[1].replace(/,/g,''));
+          let name = '', ticketType = 'ticket_normal', dateStr = '';
+          let qtyInfo = parseQuantity(secLines, i);
+          let qty = qtyInfo.qty, rooms = qtyInfo.rooms, nights = qtyInfo.nights;
+          for (let j = Math.max(0, i-15); j < i; j++) {
+            const line = secLines[j];
+            if (section.name === '酒店') {
+              if (!dateStr && line.includes('(入住)') && line.includes('(离店)')) {
+                const dm = line.match(/(\d{2}月\d{2}日).*-(\d{2}月\d{2}日)/);
+                if (dm) dateStr = dm[1] + '-' + dm[2];
+              }
+              if (line.includes('(入住)')) {
+                for (let k = j+1; k < i; k++) {
+                  const c = secLines[k];
+                  if (!/[\d¥m²]/.test(c) && !/退改|早餐|床|入住|离店|含|及|㎡|费用|价格|明细|说明/.test(c)
+                      && c.length >= 4 && c.length <= 30 && (c.includes('酒店') || c.includes('民宿') || c.includes('客栈'))) {
+                    name = c; break;
+                  }
+                }
+              }
+              if (!name) {
+                let best = '';
+                for (let k = j; k < i; k++) {
+                  const c = secLines[k];
+                  if (!/[\d¥m²]/.test(c) && !/退改|早餐|床|入住|离店|含|及|㎡|费用|价格|明细|说明/.test(c)
+                      && c.length >= 4 && c.length <= 30) {
+                    if (c.length > best.length) best = c;
+                  }
+                }
+                if (best) name = best;
+              }
+            }
+            else if (section.name === '门票') {
+              if (!dateStr && /^\d{2}月\d{2}日$/.test(line)) dateStr = line;
+              for (let j2 = Math.max(0, i-10); j2 < i; j2++) {
+                const line2 = secLines[j2];
+                if (/^\d{2}月\d{2}日$/.test(secLines[j2-1] || '') || /^\d{2}月\d{2}日$/.test(secLines[j2-2] || '')) {
+                  if (line2.length >= 2 && line2.length <= 20 && !line2.includes('门票') && !line2.includes('¥')
+                      && !line2.includes('比价') && !line2.includes('取消')) {
+                    name = line2;
+                    if (line2.includes('峨眉')) ticketType = 'ticket_emeishan';
+                    else if (line2.includes('熊猫') || line2.includes('都江堰') || line2.includes('青城山'))
+                      ticketType = 'ticket_panda_dujiangyan_qingcheng';
+                    break;
+                  }
+                }
+              }
+            }
+            else if (section.name === '机票') {
+              if (/\d{2}月\d{2}日/.test(line) && /深圳|成都|上海|广州|北京|杭州|重庆|西安|昆明/.test(line)) {
+                name = line;
+                const dm = line.match(/(\d{2}月\d{2}日)/);
+                if (dm) dateStr = dm[1];
+                break;
+              }
+            }
+            else if (section.name === '火车') {
+              if (/\d{2}月\d{2}日/.test(line)) {
+                const dm = line.match(/(\d{2}月\d{2}日)/);
+                if (dm) dateStr = dm[1];
+                for (let k = j+1; k < i; k++) {
+                  if (/^[CGD]\d+/.test(secLines[k])) { name = secLines[k]; break; }
+                }
+                if (!name) name = line;
+                break;
+              }
+            }
+            else if (section.name === '保险') {
+              if ((line.includes('旅行险') || line.includes('意外险')) && line.length > 2 && line.length < 30) {
+                name = line; break;
+              }
+            }
+            else if (section.name === '出行工具') {
+              if (line.includes('当地交通') || line.includes('用车') || line.includes('接送')) {
+                name = '用车（全程）'; break;
+              }
+            }
+            else if (section.name === '服务费') {
+              if (line === '服务费' || line === '基础服务') { name = '服务费'; break; }
+            }
+            else if (section.name === '导游') {
+              if (line.includes('导游') && !line.includes('比价') && line.length >= 2 && line.length <= 20) {
+                name = line; break;
+              }
+            }
+            else if (section.name === '活动') {
+              if (line.includes('特色体验') || line.includes('司机食宿')) {
+                name = line.includes('司机食宿') ? '司机食宿补助' : '特色体验'; break;
+              }
+            }
+          }
+          if (name) {
+            const fullName = dateStr ? `[${dateStr}] ${name}` : name;
+            allItems.push({
+              type: section.name === '出行工具' ? 'dijie' : section.name === '服务费' ? 'service' :
+                    section.name === '活动' ? 'activity' : section.name === '保险' ? 'insurance' :
+                    section.name === '火车' ? 'train' : section.name === '机票' ? 'flight' :
+                    section.name === '门票' ? 'ticket' : section.name === '酒店' ? 'hotel' :
+                    section.name === '导游' ? 'dijie' : 'other',
+              name: fullName, systemPrice: price, zicaiUnitPrice: '', quantity: qty, rooms, nights,
+              ticketType,
+              category: section.name === '出行工具' || section.name === '服务费' || section.name === '活动' || section.name === '导游' ? 'dijie' :
+                        section.name === '保险' ? 'insurance' : section.name === '火车' ? 'train' :
+                        section.name === '机票' ? 'flight' : section.name === '门票' ? 'ticket' :
+                        section.name === '酒店' ? 'hotel' : 'other',
+              source: 'zicai'
+            });
+          }
+        }
+      }
+    }
+  });
+  return allItems;
+}
+
+function renderTable() {
+  const tbody = document.getElementById('itemsBody');
+  tbody.innerHTML = '';
+  items.forEach((item, idx) => {
+    const tr = document.createElement('tr');
+    tr.dataset.index = idx;
+    const typeName = { hotel:'酒店', ticket:'门票', dijie:'地接', service:'服务', activity:'活动', insurance:'保险', flight:'机票', train:'火车' }[item.type] || item.type;
+    const tagClass = item.category === 'dijie' ? 'choice-must' : (item.category === 'insurance') ? 'choice-system' : 'choice-zicai';
+    const tagText = item.category === 'dijie' ? '必自采' : (item.category === 'insurance') ? '系统' : '可选';
+    const qtyDisplay = item.type === 'hotel' ? `${item.rooms}间×${item.nights}晚` : item.quantity;
+    const taxRate = getTaxRateText(item);
+    const showSource = ['flight','hotel','ticket','train'].includes(item.type);
+    const sourceSelect = showSource ? `
+      <select class="source-select" id="source_${idx}" onchange="updateSource(${idx}, this.value)">
+        <option value="zicai" ${item.source==='zicai'?'selected':''}>自采</option>
+        <option value="system" ${item.source==='system'?'selected':''}>系统</option>
+      </select>` : '-';
+    tr.innerHTML = `
+      <td><span class="type-tag type-${item.type}">${typeName}</span></td>
+      <td><div class="name-cell" title="${item.name}">${item.name}</div></td>
+      <td class="price-cell price-system">¥${item.systemPrice.toLocaleString()}</td>
+      <td>
+        <input type="number" class="qty-input" id="qty_${idx}" value="${item.quantity}" min="1" onchange="updateQuantity(${idx}, this.value)">
+        <div class="qty-detail">${qtyDisplay}</div>
+      </td>
+      <td><input type="number" id="zicai_${idx}" value="${item.zicaiUnitPrice}" placeholder="单价" onchange="updateZicai(${idx}, this.value)" oninput="this.classList.toggle('has-value', this.value !== '')"></td>
+      <td class="price-cell" id="zicaiTotal_${idx}">-</td>
+      <td>${sourceSelect}</td>
+      <td class="tax-rate" id="tax_${idx}">${taxRate}</td>
+      <td id="choice_${idx}">-</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function updateQuantity(idx, value) {
+  items[idx].quantity = parseInt(value) || 1;
+  if (items[idx].zicaiUnitPrice !== '') {
+    const totalCell = document.getElementById(`zicaiTotal_${idx}`);
+    totalCell.textContent = '¥' + (items[idx].zicaiUnitPrice * items[idx].quantity).toLocaleString();
+  }
+  updateSummary();
+}
+
+function updateZicai(idx, value) {
+  items[idx].zicaiUnitPrice = value === '' ? '' : parseFloat(value);
+  const totalCell = document.getElementById(`zicaiTotal_${idx}`);
+  if (totalCell) {
+    totalCell.textContent = value === '' ? '-' : '¥' + (parseFloat(value) * items[idx].quantity).toLocaleString();
+  }
+  updateSummary();
+}
+
+function updateSource(idx, value) {
+  items[idx].source = value;
+}
+
+function updateSummary() {
+  const total = items.reduce((s, i) => s + i.systemPrice, 0);
+  const pending = items.filter(i => i.zicaiUnitPrice === '').length;
+  const hotelNights = items.filter(i => i.type === 'hotel').reduce((s, i) => s + i.quantity, 0);
+  document.getElementById('itemCount').textContent = items.length;
+  document.getElementById('systemTotal').textContent = '¥' + total.toLocaleString();
+  document.getElementById('pendingZicai').textContent = pending;
+  document.getElementById('hotelNights').textContent = hotelNights;
+}
+
+function calculate() {
+  let agentTotal = 0, retailTotal = 0;
+  let agentDetail = [], retailDetail = [];
+  items.forEach(item => {
+    const system = item.systemPrice;
+    const zicai = item.zicaiUnitPrice === '' ? null : item.zicaiUnitPrice * item.quantity;
+    let agentChoice = '', agentNet = 0, retailNet = 0, agentTax = 0, retailTax = 0;
+    
+    // 零售逻辑：始终用系统价扣税
+    if (item.category === 'dijie') {
+      retailNet = system * (1 - TAX_RATES.retail.dijie); retailTax = system * TAX_RATES.retail.dijie;
+    } else if (item.category === 'insurance') {
+      retailNet = system; retailTax = 0;
+    } else if (item.category === 'flight') {
+      retailNet = system * (1 - TAX_RATES.retail.flight); retailTax = system * TAX_RATES.retail.flight;
+    } else if (item.category === 'train') {
+      retailNet = system * (1 - TAX_RATES.retail.train); retailTax = system * TAX_RATES.retail.train;
+    } else if (item.category === 'hotel') {
+      retailNet = system * (1 - TAX_RATES.retail.hotel); retailTax = system * TAX_RATES.retail.hotel;
+    } else if (item.category === 'ticket') {
+      const rr = item.ticketType === 'ticket_emeishan' ? TAX_RATES.retail.ticket_emeishan : item.ticketType === 'ticket_panda_dujiangyan_qingcheng' ? TAX_RATES.retail.ticket_panda_dujiangyan_qingcheng : TAX_RATES.retail.ticket_normal;
+      retailNet = system * (1 - rr); retailTax = system * rr;
+    }
+    
+    // 代理逻辑
+    if (item.category === 'dijie') {
+      if (zicai !== null) {
+        agentNet = zicai * (1 - TAX_RATES.agent.dijie); agentTax = zicai * TAX_RATES.agent.dijie; agentChoice = '自采';
+      } else { agentNet = system; agentTax = 0; agentChoice = '系统'; }
+    } else if (item.category === 'insurance') {
+      agentNet = system; agentTax = 0; agentChoice = '系统';
+    } else if (item.category === 'flight') {
+      if (item.source === 'system') {
+        agentNet = system; agentTax = 0; agentChoice = '系统';
+      } else if (zicai !== null) {
+        agentNet = zicai * (1 - TAX_RATES.agent.flight_zicai); agentTax = zicai * TAX_RATES.agent.flight_zicai; agentChoice = '自采';
+      } else { agentNet = system; agentTax = 0; agentChoice = '系统'; }
+    } else if (item.category === 'train') {
+      if (zicai !== null) {
+        agentNet = zicai * (1 - TAX_RATES.agent.train_zicai); agentTax = zicai * TAX_RATES.agent.train_zicai; agentChoice = '自采';
+      } else { agentNet = system; agentTax = 0; agentChoice = '系统'; }
+    } else if (item.category === 'hotel') {
+      if (item.source === 'system') {
+        agentNet = system; agentTax = 0; agentChoice = '系统';
+      } else if (zicai !== null) {
+        agentNet = zicai * (1 - TAX_RATES.agent.hotel_zicai); agentTax = zicai * TAX_RATES.agent.hotel_zicai; agentChoice = '自采';
+      } else { agentNet = system; agentTax = 0; agentChoice = '系统'; }
+    } else if (item.category === 'ticket') {
+      const ar = item.ticketType === 'ticket_emeishan' ? TAX_RATES.agent.ticket_emeishan_zicai : item.ticketType === 'ticket_panda_dujiangyan_qingcheng' ? TAX_RATES.agent.ticket_panda_dujiangyan_qingcheng_zicai : TAX_RATES.agent.ticket_normal_zicai;
+      if (item.source === 'system') {
+        agentNet = system; agentTax = 0; agentChoice = '系统';
+      } else if (zicai !== null) {
+        agentNet = zicai * (1 - ar); agentTax = zicai * ar; agentChoice = '自采';
+      } else { agentNet = system; agentTax = 0; agentChoice = '系统'; }
+    }
+    agentTotal += agentNet; retailTotal += retailNet;
+    const choiceCell = document.getElementById(`choice_${items.indexOf(item)}`);
+    if (choiceCell) choiceCell.innerHTML = `<span class="choice-tag ${agentChoice === '系统' ? 'choice-system' : 'choice-zicai'}">${agentChoice}</span>`;
+    agentDetail.push({ name: item.name, net: agentNet, tax: agentTax, choice: agentChoice });
+    retailDetail.push({ name: item.name, net: retailNet, tax: retailTax });
+    const taxCell = document.getElementById(`tax_${items.indexOf(item)}`);
+    if (taxCell) {
+      let arText, rrText;
+      if (item.category === 'dijie') { arText = '16'; rrText = '14'; }
+      else if (item.category === 'insurance') { arText = '0'; rrText = '0'; }
+      else if (item.category === 'flight') { arText = '4'; rrText = '2'; }
+      else if (item.category === 'train') { arText = '3'; rrText = '1'; }
+      else if (item.category === 'hotel') { arText = '16'; rrText = '14'; }
+      else if (item.category === 'ticket') {
+        if (item.ticketType === 'ticket_emeishan') { arText = '5.5'; rrText = '3.5'; }
+        else if (item.ticketType === 'ticket_panda_dujiangyan_qingcheng') { arText = '4'; rrText = '2'; }
+        else { arText = '9'; rrText = '7'; }
+      }
+      taxCell.innerHTML = `<span class="agent">代理${arText}%</span><br><span class="retail">零售${rrText}%</span>`;
+    }
+  });
+  const diff = agentTotal - retailTotal;
+  const isAgentBetter = diff >= 0;
+  const resultBar = document.getElementById('resultBar');
+  const badge = document.getElementById('resultBadge');
+  const agentTotalEl = document.getElementById('agentTotal');
+  const retailTotalEl = document.getElementById('retailTotal');
+  const resultDiff = document.getElementById('resultDiff');
+  resultBar.classList.add('show');
+  badge.textContent = isAgentBetter ? '代理更优' : '零售更优';
+  badge.style.background = isAgentBetter ? 'var(--success)' : 'var(--ctrip-blue)';
+  agentTotalEl.textContent = '¥' + Math.round(agentTotal).toLocaleString();
+  retailTotalEl.textContent = '¥' + Math.round(retailTotal).toLocaleString();
+  resultDiff.innerHTML = isAgentBetter ? `代理比零售多赚 <strong>¥${Math.abs(diff).toLocaleString()}</strong>` : `零售比代理多赚 <strong>¥${Math.abs(diff).toLocaleString()}</strong>`;
+  const drawerBody = document.getElementById('detailDrawerBody');
+  let detailHtml = '';
+  items.forEach((item, idx) => {
+    const a = agentDetail[idx], r = retailDetail[idx];
+    detailHtml += `<div class="detail-row"><span>${item.name}</span><span style="color:#999">代理: ¥${Math.round(a.net).toLocaleString()} ${a.choice === '自采' ? '(自采)' : '(系统)'} vs 零售: ¥${Math.round(r.net).toLocaleString()}</span></div>`;
+  });
+  detailHtml += `<div class="detail-row detail-row-total"><span>合计</span><span style="color:#999">代理: ¥${Math.round(agentTotal).toLocaleString()} vs 零售: ¥${Math.round(retailTotal).toLocaleString()}</span></div>`;
+  drawerBody.innerHTML = detailHtml;
+}
+
+function toggleDetail() {
+  document.getElementById('detailDrawer').classList.toggle('show');
+}
+
+function clearAll() {
+  document.getElementById('pasteInput').value = '';
+  items = [];
+  document.getElementById('tableCard').style.display = 'none';
+  document.getElementById('emptyState').style.display = 'block';
+  document.getElementById('calcBtn').style.display = 'none';
+  document.getElementById('statsSection').style.display = 'none';
+  document.getElementById('resultBar').classList.remove('show');
+  document.getElementById('detailDrawer').classList.remove('show');
+}
+
+function loadDemo() {
+  const demo = `下拉可刷新
+【致中山贵宾专属方案】峨乐天府畅游+童话九寨沟7天6晚定制行
+订单号：1128146009887063
+6月6日
+周六出发
+4成人2儿童
+上海出发
+6月12日
+周五返回
+方案速览
+7日行程
+费用包含
+机票
+火车
+酒店
+门票
+保险
+出行工具
+服务费
+机票
+¥10200
+机票出游提醒
+06月06日(周六)深圳成都
+中国国航 CA4338经济舱有餐食空客321飞2h30m
+11:15
+宝安国际机场 T3
+13:45
+双流国际机场 T2
+成人票
+¥830 x 6人
+总价
+¥4980
+去携程机票比价
+改签、行李额及购票说明
+退改¥183起
+免费托运行李额20kg/人
+费用说明: 机票报价包含机场建设费、燃油附加费和税费。
+机票出游提醒
+06月12日(周五)成都深圳
+西藏航空 TV9901经济舱小食空客320飞2h40m
+13:55
+双流国际机场 T2
+16:35
+宝安国际机场 T3
+成人票
+¥870 x 6人
+总价
+¥5220
+去携程机票比价
+改签、行李额及购票说明
+退改¥65起
+免费托运行李额20kg/人
+费用说明: 机票报价包含机场建设费、燃油附加费和税费。
+火车
+¥1338
+06月08日(周一)
+C5792二等座2h22m
+10:06
+成都东
+12:28
+松潘
+成人
+¥135 x 4人
+儿童
+¥67 x 2人
+总价
+¥674
+去携程火车比价
+不可退改
+06月09日(周二)
+C18二等座2h24m
+19:00
+黄龙九寨
+21:24
+成都东
+成人
+¥133 x 4人
+儿童
+¥66 x 2人
+总价
+¥664
+去携程火车比价
+不可退改
+酒店
+¥5410
+06月06日(入住) - 06月08日(离店)2晚
+美沁酒店(成都宽窄巷子奎星楼店)
+宽窄巷子/中医学院附近地区/春熙路/太古里商业区
+沁旅悦享家庭房（电视投屏+智能客控）
+3份早餐·1张大床 及 1张单人床·3人入住·32-38m²
+沁旅悦享家庭房（电视投屏+智能客控）
+¥439 x 2间 x 2晚
+总价
+¥1756
+退改说明
+06月08日(入住) - 06月09日(离店)1晚
+JS·吉盛酒店(九寨沟游客中心店)
+九寨沟景区游客中心
+隐逸·亲子家庭房
+3份早餐·1张大床 及 1张单人床·3人入住·30m²
+隐逸·亲子家庭房
+¥470 x 2间 x 1晚
+总价
+¥940
+退改说明
+06月09日(入住) - 06月10日(离店)1晚
+美沁酒店(成都宽窄巷子奎星楼店)
+宽窄巷子/中医学院附近地区/春熙路/太古里商业区
+沁旅悦享家庭房（电视投屏+智能客控）
+含3早·多床·3人入住· 32-38 ㎡
+入住时间: 14:00以后
+离店时间: 12:00以前
+沁旅悦享家庭房（电视投屏+智能客控）
+¥429 x 2间 x 1晚
+总价
+¥858
+不可退改
+06月10日(入住) - 06月11日(离店)1晚
+峨眉山景区希尔顿欢朋酒店
+报国寺/峨眉山站
+豪华亲子大床房
+3份早餐·1张大床 及 1张沙发床·3人入住·38m²
+豪华亲子大床房
+¥489 x 2间 x 1晚
+总价
+¥978
+退改说明
+06月11日(入住) - 06月12日(离店)1晚
+美沁酒店(成都宽窄巷子奎星楼店)
+宽窄巷子/中医学院附近地区/春熙路/太古里商业区
+沁旅悦享家庭房（电视投屏+智能客控）
+含3早·多床·3人入住· 32-38 ㎡
+入住时间: 14:00以后
+离店时间: 12:00以前
+沁旅悦享家庭房（电视投屏+智能客控）
+¥439 x 2间 x 1晚
+总价
+¥878
+不可退改
+门票
+¥4860
+06月07日
+三星堆博物馆
+三星堆博物馆门票成人票
+¥72 x 4份
+三星堆博物馆门票学生票
+¥36 x 2份
+总价
+¥360
+去携程门票比价
+行程出发日期前一天23:59前可免费取消
+06月07日
+都江堰景区
+都江堰景区门票成人票
+¥80 x 4份
+都江堰景区门票学生票
+¥40 x 2份
+总价
+¥400
+去携程门票比价
+行程出发日期前一天23:59前可免费取消
+06月08日
+黄龙风景名胜区
+黄龙风景名胜区门票+上行索道票+观光车成人票
+¥270 x 2份
+黄龙风景名胜区门票+上行索道票+观光车青少年票(7周岁(含)-18周岁(含))
+¥185 x 2份
+黄龙风景名胜区门票+上行索道票+观光车老人票(60周岁及以上(非法定节假日))
+¥100 x 2份
+总价
+¥1110
+去携程门票比价
+行程出发日期前一天23:59前可免费取消
+06月09日
+九寨沟风景区
+九寨沟风景区门票+观光车票成人票
+¥280 x 2份
+九寨沟风景区门票+观光车票学生票(7周岁(含)-14周岁(含))
+¥140 x 2份
+九寨沟风景区门票+观光车票老人票(65周岁(含)以上)
+¥90 x 2份
+总价
+¥1020
+去携程门票比价
+行程出发日期前一天23:59前可免费取消
+06月10日
+乐山大佛
+乐山大佛日游游山门票游船票
+¥70 x 6份
+总价
+¥420
+去携程门票比价
+行程出发日期前一天23:59前可免费取消
+06月11日
+峨眉山
+峨眉山门票+峨眉山站/报国寺站/黄湾站-雷洞坪景区直通车(含金顶往返索道)成人票
+¥370 x 2份
+峨眉山门票+峨眉山站/报国寺站/黄湾站-雷洞坪景区直通车(含金顶往返索道)学生票
+¥195 x 2份
+峨眉山门票+峨眉山站/报国寺站/黄湾站-雷洞坪景区直通车(含金顶往返索道)老人票(65周岁(含)以上)
+¥210 x 2份
+总价
+¥1550
+去携程门票比价
+行程出发日期前一天23:59前可免费取消
+保险
+¥168
+80%的人选择保险，保障出行安全
+06月06日 - 06月12日
+华泰中国游旅行险 基础版
+0-90岁
+¥28 x 6人
+总价
+¥168
+去携程保险比价
+退改说明
+出行工具
+¥4750
+06月06日 - 06月12日
+成都当地交通
+价格明细
+¥4750 x 1份
+总价
+¥4750
+不可退改
+费用说明: 费用说明：成都接送机，成都东站接送站
+行程用车，详细内容见行程描述
+服务费
+¥840
+基础服务
+行程资源代订
+协调预订变更
+每日行程安排和注意事项提醒
+出行返程提示
+突发事件处理
+增值服务
+游玩攻略和特色玩法推荐
+价格明细
+¥20x6人x7天
+总价
+¥840
+不可退改
+预订须知及安全提示
+预订说明、出行指南及法规
+查看详情
+携程旅行定制师均为携程甄选培训考核上岗的目的地专家，该定制师由中游国际旅行社（成都）有限公司成华分公司委派为您服务，同时携程平台会对服务进行监督和保障。
+合同签订提示
+若您代表公司签订合同，请将公司盖章授权书原件提供给定制师，便于定制师后续制作合同。
+优惠
+优惠券
+无可用优惠券
+分享完整方案，含"报价明细"（取消勾选则不分享报价）
+我已阅读并同意中国国际航空股份有限公司旅客行李运输总条件、西藏航空有限公司旅客、行李运输总条件
+￥
+27566
+联系定制师
+确认方案`;
+  document.getElementById('pasteInput').value = demo;
+  parseAndFill();
+}
+</script>
+</body>
+</html>
